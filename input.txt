@@ -1,0 +1,5 @@
+BFS
+no open
+small
+R,R,_
+B,B,_
