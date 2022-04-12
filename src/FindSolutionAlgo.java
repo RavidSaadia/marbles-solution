@@ -3,15 +3,15 @@ import java.util.Hashtable;
 public abstract class FindSolutionAlgo {
     private final String EMPTY = "_";
     private Hashtable<String, int[]> indexGaol = new Hashtable<>();
-    private char[][] start;
+    private char[][] startState;
 
 
     private char[][] goal;
     private boolean printOpenList;
     private int size = 5;
 
-    public FindSolutionAlgo(char[][] start, char[][] goal, boolean printOpenList) {
-        this.start = start;
+    public FindSolutionAlgo(char[][] startState, char[][] goal, boolean printOpenList) {
+        this.startState = startState;
         this.goal = goal;
         this.printOpenList = printOpenList;
     }
@@ -19,19 +19,19 @@ public abstract class FindSolutionAlgo {
 
 
 
-    public abstract State findPath();
+    public abstract State findPath(); // implemented by the Algo classes.
 
      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
      //////////////////////////////////////////////////    GETTERS & SETTERS     ////////////////////////////////////////////////////////////////////
      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    public char[][] getStart() {
-        return start;
+    public char[][] getStartState() {
+        return startState;
     }
 
-    public void setStart(char[][] start) {
-        this.start = start;
+    public void setStartState(char[][] startState) {
+        this.startState = startState;
     }
 
     public char[][] getGoal() {
