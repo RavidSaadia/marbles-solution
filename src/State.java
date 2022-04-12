@@ -3,13 +3,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class State {
-
+    /**
+     * The position that are empty in board, in the board[i][j] location
+     * and the direction that about to play ('U' 'D' 'L' 'R' ).
+     */
     private class EmptyPos {
         private int i;
         private int j;
         private char color = ' ';
-
-
         private char direction;
 
         public EmptyPos(int i, int j) {
@@ -98,7 +99,6 @@ public class State {
         this.step = step;
         emptyPos = new LinkedList<>();
 //        emptyMatrix = new boolean[boardSize][boardSize];
-
         this.id = ++MOVES_NUMBER; //+1 to MOVES_NUMBER and save as id of this state.
         updateEmptyPos();
 //        updateOpposite();
@@ -150,7 +150,6 @@ public class State {
     private void right(Queue<State> legalOperators, EmptyPos p) {
         p.setDirection('R');
         changeAndInsert(legalOperators, p);
-
     }
 
     private void left(Queue<State> leagalOperators, EmptyPos p) {
@@ -162,22 +161,68 @@ public class State {
      * Calculate the new state and insert him to the legalOperators.
      *
      * @param legalOperators
-     * @param p
+     * @param pos
      */
-    private void changeAndInsert(Queue<State> legalOperators, EmptyPos p) {
-        if (emptyOrEdge(p) || isFather(p)) {
+    private void changeAndInsert(Queue<State> legalOperators, EmptyPos pos) {
+        if (emptyOrEdge(pos) || isFather(pos)) {
             return;
         }
+        char[][] nextBoard = deepBoardCopy(this.board);
+        makeMove(nextBoard, pos);
 
+        String step = calculateStep(board, pos);
+        String path;
+        if (this.path.isEmpty()) {
+            path = step;
+        } else {
+            path = this.path + "--" + step;
+        }
+        char color = step.charAt(step.lastIndexOf(":") - 1); // get the color from the step string: (x,x):color:(x,x)
+        int stepPrice = calcStepPrice(color);
+        int price = stepPrice + this.price;
+//        Position _p = checkEmpty(p, next);
 
-        State son = new State(next, this, this.level, price, w, path, step, _p.getX1(), _p.getY1(), _p.getX2(), _p.getY2());
+//    public State(char[][] board, State father, int level, int price, double heuristic, String path, String step) {
+
+        State son = new State(nextBoard, this, this.level, price, stepPrice, path, step);
         legalOperators.add(son);
     }
 
-    private boolean isFather(EmptyPos p) {
+    private int calcStepPrice(char color) {
+        switch (color) {
+            case 'R': {
+                return 1;
+            }
+            case'Y' : {
+                return 1;
+            }
+            case 'B' : {
+                return 2;
+            }
+            case 'G' : {
+                return 10;
+            }
+        }
+        return Integer.MIN_VALUE;
+    }
+
+    private String calculateStep(char[][] board, EmptyPos pos) {
+        String step = "";
+        int targetI = getPosTarget(pos, 'i');
+        int targetJ = getPosTarget(pos, 'j');
+        char color = board[targetI][targetJ];
+        step += "(" + (targetI+1) + "," +(targetJ+1)  + "):" + color +":("+
+                (pos.getI()+1)   + "," + (pos.getJ()+1) + ")";
+        return step;
+    }
+
+    private boolean isFather(EmptyPos pos) {
+        if (this.father==null){
+            return false;
+        }
         char[][] father = deepBoardCopy(this.board);
-        makeMove(father, p);
-        if (isBoardEquals(this.board, father)) {
+        makeMove(father, pos);
+        if (isBoardEquals(this.father.board, father)) {
             return true;
         }
         return false;
@@ -204,26 +249,58 @@ public class State {
     /**
      * transfer the old board to the new one according the pos.
      *
-     * @param oldBoard board before change
-     * @param p        position
+     * @param board board before change
+     * @param pos   position
      * @return the new board.
      */
-    private char[][] makeMove(char[][] oldBoard, EmptyPos p) {
+    private char[][] makeMove(char[][] board, EmptyPos pos) {
 
-        switch (p.getDirection()) {
-            case 'U':
-                swap(oldBoard, p.getI(), p.getJ(), p.getI() - 1, p.getJ());
-            case 'D':
-                swap(oldBoard, p.getI(), p.getJ(), p.getI() + 1, p.getJ());
+        swap(board, pos.getI(), pos.getJ(), getPosTarget(pos, 'i'), getPosTarget(pos, 'j'));
 
-            case 'L':
-                swap(oldBoard, p.getI(), p.getJ(), p.getI(), p.getJ() - 1);
+//        switch (pos.getDirection()) {
+//            case 'U' -> swap(board, pos.getI(), pos.getJ(), pos.getI() - 1, pos.getJ());
+//            case 'D' -> swap(board, pos.getI(), pos.getJ(), pos.getI() + 1, pos.getJ());
+//            case 'L' -> swap(board, pos.getI(), pos.getJ(), pos.getI(), pos.getJ() - 1);
+//            case 'R' -> swap(board, pos.getI(), pos.getJ(), pos.getI(), pos.getJ() + 1);
+//        }
+        return board;
+    }
 
-            case 'R':
-                swap(oldBoard, p.getI(), p.getJ(), p.getI(), p.getJ() + 1);
-
+    /**
+     * calculate the target point of position.
+     *
+     * @param pos  the position.
+     * @param iOrj say witch index you want to get- i or j.
+     * @return
+     */
+    private int getPosTarget(EmptyPos pos, char iOrj) {
+        switch (pos.getDirection()) {
+            case 'U' : {
+                if (iOrj == 'i') {
+                    return pos.getI() - 1;
+                }
+                return pos.getJ();
+            }
+            case 'D' : {
+                if (iOrj == 'i') {
+                    return pos.getI() + 1;
+                }
+                return pos.getJ();
+            }
+            case 'L' : {
+                if (iOrj == 'j') {
+                    return pos.getJ() - 1;
+                }
+                return pos.getI();
+            }
+            case 'R' : {
+                if (iOrj == 'j') {
+                    return pos.getJ() + 1;
+                }
+                return pos.getI();
+            }
         }
-        return oldBoard;
+        return -1;
     }
 
     /**
@@ -255,25 +332,28 @@ public class State {
      * check if the action is legal - if we try to switch with empty place,
      * or we are edge in the board edge
      *
-     * @param p the empty place we want to move according to p.getDirection()
+     * @param pos the empty place we want to move according to pos.getDirection()
      * @return true if the action is not legal.
      */
-    private boolean emptyOrEdge(EmptyPos p) {
-        switch (p.getDirection()) {
+    private boolean emptyOrEdge(EmptyPos pos) {
+        switch (pos.getDirection()) {
             case 'U':
-                if (p.getI() == 0 || (board[p.getI() - 1][p.getJ()] == EMPTY)) {
+                if (pos.getI() == 0 || (board[pos.getI() - 1][pos.getJ()] == EMPTY)) {
                     return true;
                 }
+                break;
             case 'D':
-                if (p.getI() == boardSize - 1 || (board[p.getI() + 1][p.getJ()] == EMPTY)) {
+                if (pos.getI() == boardSize - 1 || (board[pos.getI() + 1][pos.getJ()] == EMPTY)) {
                     return true;
                 }
+                break;
             case 'L':
-                if (p.getJ() == 0 || (board[p.getI()][p.getJ() - 1] == EMPTY)) {
+                if (pos.getJ() == 0 || (board[pos.getI()][pos.getJ() - 1] == EMPTY)) {
                     return true;
                 }
+                break;
             case 'R':
-                if (p.getJ() == boardSize - 1 || (board[p.getI()][p.getJ() + 1] == EMPTY)) {
+                if (pos.getJ() == boardSize - 1 || (board[pos.getI()][pos.getJ() + 1] == EMPTY)) {
                     return true;
                 }
                 break;

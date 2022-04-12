@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -27,7 +29,7 @@ public class SolutionManager {
         this.ans = findSolAlgo.findPath();
         double end=(double)(System.currentTimeMillis())/1000;
         this.time=end-start;
-
+        writeRes("output.txt");
     }
 
     private FindSolutionAlgo readInput(String inputFile) {
@@ -85,4 +87,39 @@ public class SolutionManager {
         }
         return null;
     }
+
+    /***
+     * This function writes the output of the solution to file.
+     * @param file-file name
+     * @return
+     */
+    private   void writeRes(String file){
+        try {
+
+            FileWriter myWriter = new FileWriter(file);
+
+            if(ans==null){
+                myWriter.append("no path\n");
+                myWriter.append("Num: ").append(String.valueOf(State.MOVES_NUMBER)).append("\n");
+                if(true){
+                    myWriter.append("").append(String.valueOf(time)).append(" seconds\n");
+                }
+                myWriter.close();
+                return;
+            }
+            myWriter.append(ans.getPath());
+            myWriter.append("\n");
+            myWriter.append("Num: ").append(String.valueOf(ans.getId())).append("\n");
+            myWriter.append("Cost: ").append(String.valueOf(ans.getPrice())).append("\n");
+            if(true){
+                myWriter.append("").append(String.valueOf(time)).append(" seconds\n");
+            }
+            myWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }
