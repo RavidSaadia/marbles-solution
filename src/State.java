@@ -1,8 +1,6 @@
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
-public class State {
+public class State implements Comparable<State> {
     /**
      * The position that are empty in board, in the board[i][j] location
      * and the direction that about to play ('U' 'D' 'L' 'R' ).
@@ -68,23 +66,21 @@ public class State {
         }
     }
 
-    public static int MOVES_NUMBER = 0;
+    public static int NODE_NUMBER = 0;
     private char[][] board;
     private State father = null;
-
-
     private int id;
     private int price = 0;
     private double heuristic = 0;
     private String step = "";
     private String path = "";
     private int level = 0;
-    private LinkedList<EmptyPos> emptyPos;//num of empty position
+    private LinkedList<EmptyPos> emptyPosList;//num of empty position
     //    private boolean[][] emptyMatrix;
     private boolean out = false;
     private Hashtable<Character, Character> isOpposite = new Hashtable<>();
     private final char EMPTY = '_';
-    private int boardSize;
+    private final int boardSize;
 
 //private int
 
@@ -97,9 +93,9 @@ public class State {
         this.path = path;
         this.level = level + 1;
         this.step = step;
-        emptyPos = new LinkedList<>();
+        emptyPosList = new LinkedList<>();
 //        emptyMatrix = new boolean[boardSize][boardSize];
-        this.id = ++MOVES_NUMBER; //+1 to MOVES_NUMBER and save as id of this state.
+        this.id = ++NODE_NUMBER; //+1 to MOVES_NUMBER and save as id of this state.
         updateEmptyPos();
 //        updateOpposite();
 
@@ -109,10 +105,10 @@ public class State {
     public State(char[][] board) {
         this.board = board;
         boardSize = board.length;
-        emptyPos = new LinkedList<>();
+        emptyPosList = new LinkedList<>();
 //        emptyMatrix = new boolean[boardSize][boardSize];
 //        positions = new Position[(boardSize-3)*3+3]; // num of empty places: if(boardSize=3)->3 if(boardSize=5)->9
-        this.id = ++MOVES_NUMBER; //+1 to MOVES_NUMBER and save as id of this state.
+        this.id = ++NODE_NUMBER; //+1 to MOVES_NUMBER and save as id of this state.
         updateEmptyPos();
 
     }
@@ -123,7 +119,7 @@ public class State {
     public Queue<State> getLegalOperators() { //getSuccessors
         Queue<State> legalOperators = new LinkedList<>();
 
-        for (EmptyPos p : emptyPos) {
+        for (EmptyPos p : emptyPosList) {
             left(legalOperators, p);
             right(legalOperators, p);
             up(legalOperators, p);
@@ -193,13 +189,13 @@ public class State {
             case 'R': {
                 return 1;
             }
-            case'Y' : {
+            case 'Y': {
                 return 1;
             }
-            case 'B' : {
+            case 'B': {
                 return 2;
             }
-            case 'G' : {
+            case 'G': {
                 return 10;
             }
         }
@@ -211,13 +207,13 @@ public class State {
         int targetI = getPosTarget(pos, 'i');
         int targetJ = getPosTarget(pos, 'j');
         char color = board[targetI][targetJ];
-        step += "(" + (targetI+1) + "," +(targetJ+1)  + "):" + color +":("+
-                (pos.getI()+1)   + "," + (pos.getJ()+1) + ")";
+        step += "(" + (targetI + 1) + "," + (targetJ + 1) + "):" + color + ":(" +
+                (pos.getI() + 1) + "," + (pos.getJ() + 1) + ")";
         return step;
     }
 
     private boolean isFather(EmptyPos pos) {
-        if (this.father==null){
+        if (this.father == null) {
             return false;
         }
         char[][] father = deepBoardCopy(this.board);
@@ -275,25 +271,25 @@ public class State {
      */
     private int getPosTarget(EmptyPos pos, char iOrj) {
         switch (pos.getDirection()) {
-            case 'U' : {
+            case 'U': {
                 if (iOrj == 'i') {
                     return pos.getI() - 1;
                 }
                 return pos.getJ();
             }
-            case 'D' : {
+            case 'D': {
                 if (iOrj == 'i') {
                     return pos.getI() + 1;
                 }
                 return pos.getJ();
             }
-            case 'L' : {
+            case 'L': {
                 if (iOrj == 'j') {
                     return pos.getJ() - 1;
                 }
                 return pos.getI();
             }
-            case 'R' : {
+            case 'R': {
                 if (iOrj == 'j') {
                     return pos.getJ() + 1;
                 }
@@ -366,8 +362,7 @@ public class State {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 if (board[i][j] == EMPTY) {
-                    emptyPos.add(new EmptyPos(i, j));
-//                    emptyMatrix[i][j] = true;
+                    emptyPosList.add(new EmptyPos(i, j));
                 }
             }
         }
@@ -459,7 +454,7 @@ public class State {
     }
 
     /***
-     * set he heuristic value of this state(only for informed algorithms).
+     * set the heuristic value of this state(only for informed algorithms).
      * @param heuristic heuristic value
      */
     public void setHeuristic(double heuristic) {
@@ -475,7 +470,7 @@ public class State {
     }
 
     /***
-     * set the ptice of this state
+     * set the price of this state
      * @param price price
      */
     public void setPrice(int price) {
@@ -496,15 +491,43 @@ public class State {
         return res;
     }
 
+    /***
+     * toString method.
+     * @return
+     */
+    @Override
+    public String toString() {
+        StringBuilder res =
+                new StringBuilder("\nboard=\n");
+        for (int i = 0; i < board.length; i++) {
+            res.append(Arrays.toString(board[i])).append("\n");
+        }
+        return res.toString();
 
-    //
-    //
-    public void State1(char[][] board, State father, int level, int price, double heuristic, String path, String step) {
     }
 
+    @Override
+    public int compareTo(State o) {
+        if (o.getHeuristic() == this.getHeuristic()) {
+            return Double.compare(this.getId(), o.getId());
+        }
+        return Double.compare(this.getHeuristic(), o.getHeuristic());
 
-    private boolean isNotFather() {
-        return false;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        return Objects.equals(this.toString(), obj.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(this.getBoard());
+    }
 }

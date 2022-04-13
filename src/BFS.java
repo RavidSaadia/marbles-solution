@@ -14,6 +14,8 @@ public class BFS extends FindSolutionAlgo {
     @Override
     public State findPath() {
         Queue<State> q = new LinkedList<>();
+//        Hashtable<State, State> open = new Hashtable<>();
+//        Hashtable<State, State> close = new Hashtable<>();
         Hashtable<State, State> open = new Hashtable<>();
         Hashtable<State, State> close = new Hashtable<>();
         State start = new State(getStartState());
@@ -23,12 +25,13 @@ public class BFS extends FindSolutionAlgo {
             return start;
         }
         while (!q.isEmpty()) {
-            if (isPrintOpenList()) {
+            if (isWithOpen()) {
                 System.out.println("open\n" + q);
             }
             State n = q.poll();
             open.remove(n,n);
             close.put(n, n);
+            assert n != null;
             Queue<State> operation = n.getLegalOperators();
             while (!operation.isEmpty()) {
                 State son = operation.poll();

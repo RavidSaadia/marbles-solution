@@ -100,7 +100,7 @@ public class SolutionManager {
 
             if(ans==null){
                 myWriter.append("no path\n");
-                myWriter.append("Num: ").append(String.valueOf(State.MOVES_NUMBER)).append("\n");
+                myWriter.append("Num: ").append(String.valueOf(State.NODE_NUMBER)).append("\n");
                 if(true){
                     myWriter.append("").append(String.valueOf(time)).append(" seconds\n");
                 }
