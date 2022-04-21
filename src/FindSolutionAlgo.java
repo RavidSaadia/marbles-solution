@@ -3,9 +3,9 @@ import java.util.Hashtable;
 public abstract class FindSolutionAlgo {
     private final String EMPTY = "_";
     private Hashtable<Character, int[]> indexGaol = new Hashtable<>();
+    private Hashtable<Character, Integer> PRICE = new Hashtable<>();
+
     private char[][] startState;
-
-
     private char[][] goal;
     private boolean withOpen;
     private int size = 5;
@@ -14,36 +14,78 @@ public abstract class FindSolutionAlgo {
         this.startState = startState;
         this.goal = goal;
         this.withOpen = withOpen;
+        PRICE.put('R', 1);
+        PRICE.put('Y', 1);
+        PRICE.put('G', 10);
+        PRICE.put('B', 2);
     }
 
 
     /***
-     * Make a map that contain for each string in the gaol its location,
+     * Make a map that contain for each string in the goal its location,
      * for support o(1) time when we need it in the Heuristic function.
      */
     protected void makeGoalMap() {
         for (int i = 0; i < goal.length; i++) {
-            for (int j = 0; j < goal[0].length; j++) {
+            for (int j = 0; j < goal.length; j++) {
                 indexGaol.put(goal[i][j], new int[]{i, j});
             }
         }
     }
+
     /***
      * The heuristic function for the relevant algorithms.
-     * sum(Manhattan(state))+2xlinear conflict(state)
+     *
      * @param state
      */
     protected void heuristic(State state) {
-
-
-
-
-//
+        int size = state.getBoard().length;
+        boolean[][] stateChecked = new boolean[size][size];
+        boolean[][] goalIsCatched = new boolean[size][size];
+        int[][] minPath = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                minPath[i][j] = Integer.MAX_VALUE; // impossible distance just for initialize
+            }
+        }
 //        int linar = 0;
-//        double sum = 0, avg;
-//        char[][] curr = state.getBoard();
-//        for (int i = 0; i < curr.length; i++) {
-//            for (int j = 0; j < curr[0].length; j++) {
+        double sum = 0, avg;
+        int mindist = 0;
+        char[][] curr = state.getBoard();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {// for every cell in the state
+                if (curr[i][j] == '_'){
+                    continue;
+                }
+                int kTemp = 0, lTemp = 0;
+                kLoop:
+                for (int k = 0; k < size; k++) {
+                    for (int l = 0; l < size; l++) { // for every cell in goal
+                        if (curr[i][j] == goal[k][l] && !goalIsCatched[k][l]) {
+                            int dist = calcDistance(i, j, k, l, curr[i][j]);
+                            if (minPath[i][j] > dist) {
+                                minPath[i][j] = dist;
+                                kTemp = k;
+                                lTemp = l;
+                            if (dist==0){break kLoop;} // 0 is the smallest value...
+                            }
+
+                        }
+
+                    }
+                }
+                goalIsCatched[kTemp][lTemp] = true;
+
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (minPath[i][j] != Integer.MAX_VALUE){
+                    sum += minPath[i][j];
+                }
+            }
+        }
+        state.setHeuristic(sum);
 //                int[] index = indexGaol.get(curr[i][j]);
 //                double m = manhattan(i, j, index[0], index[1]);
 //                if (m != 0) {
@@ -55,21 +97,26 @@ public abstract class FindSolutionAlgo {
 //            }
 //        }
 //        linar = findConflict(curr);
-//        if(state.isTwoEmpty()){
-//            linar*=3;
-//            sum*=3;
-//        }else{
-//            linar*=5;
-//            sum*=5;
+//        if (state.isTwoEmpty()) {
+//            linar *= 3;
+//            sum *= 3;
+//        } else {
+//            linar *= 5;
+//            sum *= 5;
 //        }
 //        state.setHeuristic(state.getPrice() + sum + 2 * linar);
     }
 
+    private int calcDistance(int i, int j, int k, int l, char color) {
+
+        return PRICE.get(color) * (Math.abs(i - k) + Math.abs(j - l));
+    }
+
     public abstract State findPath(); // implemented by the Algo classes.
 
-     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-     //////////////////////////////////////////////////    GETTERS & SETTERS     ////////////////////////////////////////////////////////////////////
-     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////    GETTERS & SETTERS     ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     public char[][] getStartState() {
