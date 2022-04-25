@@ -78,6 +78,7 @@ public abstract class FindSolutionAlgo {
 
             }
         }
+        // sum the minimum paths of all the marbles
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (minPath[i][j] != Integer.MAX_VALUE){

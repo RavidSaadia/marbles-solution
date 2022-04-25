@@ -84,6 +84,8 @@ public class State implements Comparable<State> {
 
 //private int
 
+    public State(int len){boardSize=len;}
+
     public State(char[][] board, State father, int level, int price, double heuristic, String path, String step) {
         boardSize = board.length;
         this.board = board;
