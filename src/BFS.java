@@ -11,42 +11,49 @@ public class BFS extends FindSolutionAlgo {
 
     }
 
+
+
+
+
+
+
+    /***
+     * BFS algorithm - with open list and close list.
+     *
+     * @return the gaol state
+     */
     @Override
     public State findPath() {
-        Queue<State> q = new LinkedList<>();
-//        Hashtable<State, State> open = new Hashtable<>();
-//        Hashtable<State, State> close = new Hashtable<>();
-        Hashtable<State, State> open = new Hashtable<>();
-        Hashtable<State, State> close = new Hashtable<>();
+        Hashtable<State, State> closeList = new Hashtable<>();
+        Hashtable<State, State> openList = new Hashtable<>();
         State start = new State(getStartState());
-        q.add(start);
-        open.put(start, start);
-        if (Arrays.deepEquals(start.getBoard(), getGoal())) {
+        Queue<State> queue = new LinkedList<>();
+        queue.add(start);
+        openList.put(start, start);
+        if (Arrays.deepEquals(start.getBoard(), getGoal())) {//if start == goal
             return start;
         }
-        while (!q.isEmpty()) {
+        while (!queue.isEmpty()) {
             if (isWithOpen()) {
-                System.out.println("open\n" + q);
+                System.out.println("OPEN:\n" + queue);
             }
-            State n = q.poll();
-            open.remove(n,n);
-            close.put(n, n);
-            assert n != null;
-            Queue<State> operation = n.getLegalOperators();
+            State currState = queue.poll();
+            assert currState != null;
+            openList.remove(currState,currState);
+            closeList.put(currState, currState);
+            Queue<State> operation = currState.getLegalOperators();
             while (!operation.isEmpty()) {
                 State son = operation.poll();
-                if (close.get(son) != null || open.get(son) != null) { // in close list
+                if (closeList.get(son) != null || openList.get(son) != null) { // in closeList list
                     continue;
                 }
-
                 if (Arrays.deepEquals(son.getBoard(), getGoal())) {
                     return son;
                 }
-                q.add(son);
-                open.put(son, son);
+                queue.add(son);
+                openList.put(son, son);
             }
         }
         return null;
     }
-
 }

@@ -176,7 +176,7 @@ public class State implements Comparable<State> {
             path = this.path + "--" + step;
         }
         char color = step.charAt(step.lastIndexOf(":") - 1); // get the color from the step string: (x,x):color:(x,x)
-        int stepPrice = calcStepPrice(color);
+        int stepPrice = FindSolutionAlgo.PRICE.get(color);
         int price = stepPrice + this.price;
 //        Position _p = checkEmpty(p, next);
 
@@ -186,23 +186,7 @@ public class State implements Comparable<State> {
         legalOperators.add(son);
     }
 
-    private int calcStepPrice(char color) {
-        switch (color) {
-            case 'R': {
-                return 1;
-            }
-            case 'Y': {
-                return 1;
-            }
-            case 'B': {
-                return 2;
-            }
-            case 'G': {
-                return 10;
-            }
-        }
-        return Integer.MIN_VALUE;
-    }
+
 
     private String calculateStep(char[][] board, EmptyPos pos) {
         String step = "";
@@ -500,7 +484,7 @@ public class State implements Comparable<State> {
     @Override
     public String toString() {
         StringBuilder res =
-                new StringBuilder("\nboard=\n");
+                new StringBuilder("\n -BOARD-\n");
         for (int i = 0; i < board.length; i++) {
             res.append(Arrays.toString(board[i])).append("\n");
         }

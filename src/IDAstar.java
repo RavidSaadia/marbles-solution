@@ -1,7 +1,4 @@
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class IDAstar extends FindSolutionAlgo{
 
@@ -13,37 +10,32 @@ public class IDAstar extends FindSolutionAlgo{
 
     @Override
     public State findPath() {
-        makeGoalMap();
+
         Hashtable<State, State> open = new Hashtable<>();
-        LinkedList<State> stack = new LinkedList<>();
+        Stack<State> stack = new Stack<>();
         State start = new State(getStartState());
         heuristic(start);
         double t = start.getHeuristic();
         while (t != Double.MAX_VALUE) {
-            stack.clear();
             double minf = Double.MAX_VALUE;
             start.setOut(false);
-
             stack.push(start);
             open.put(start, start);
 
-
             while (!stack.isEmpty()) {
                 if (isWithOpen()) {
-                    System.out.println("open\n" + stack);
+                    System.out.println("WITH OPEN\n" + stack);
                 }
                 State n = stack.pop();
-
-
                 if (n.isOut()) {
                     open.remove(n, n);
                 } else {
-
                     n.setOut(true);
                     stack.push(n);
                     if (isWithOpen()) {
                         System.out.println("open\n" + stack);
                     }
+
                     Queue<State> opertion = n.getLegalOperators();
                     while (!opertion.isEmpty()) {
                         State son = opertion.poll();
@@ -62,7 +54,6 @@ public class IDAstar extends FindSolutionAlgo{
                             }
                         }
                         if (Arrays.deepEquals(son.getBoard(), getGoal())) {
-
                             return son;
                         }
                         stack.push(son);

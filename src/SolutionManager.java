@@ -5,14 +5,10 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static java.lang.System.exit;
+
 public class SolutionManager {
 
-
-    public static final int NUN = 0;
-    public static final int RED = 1;
-    public static final int YELLOW = 2;
-    public static final int BLUE = 3;
-    public static final int GREEN = 4;
     public static final int SMALL_BOARD = 3;
     public static final int BIG_BOARD = 5;
 
@@ -76,14 +72,18 @@ public class SolutionManager {
                     return new IDAstar(start, goal, printOpenList);
                 case "DFBnB":
                     return new DFBnB(start, goal, printOpenList);
+                default:
+                    System.err.println("Not valid algorithm");
+                    exit(1);
             }
 
         } catch (FileNotFoundException ex) {
             System.err.println("Error, file not found : " + ex);
+            exit(1);
         }
         catch (Exception ex){
             System.err.println("Error while reading the file : " + ex);
-
+            exit(1);
         }
         return null;
     }

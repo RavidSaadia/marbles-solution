@@ -2,13 +2,20 @@ BFS
 no open
 big
 R,R,_,R,Y
-B,B,_,R,_
-G,G,Y,G,G
-B,B,_,_,_
-Y,Y,_,_,_
-Goal state:
-R,R,_,_,Y
-B,B,_,R,_
-G,G,Y,R,_
-B,B,_,G,_
-Y,Y,G,_,_
+B,B,_,_,Y
+G,G,_,G,B
+_,B,Y,R,_
+G,Y,_,_,_
+Goal state
+R,R,_,R,Y
+B,_,_,B,Y
+G,G,_,_,B
+_,B,Y,R,_
+G,Y,_,G,_
+
+
+
+
+
+
+

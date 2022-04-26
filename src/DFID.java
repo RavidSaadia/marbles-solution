@@ -31,7 +31,7 @@ public class DFID extends FindSolutionAlgo {
             return cutOff;
         } else {
             if (isWithOpen()) {
-                System.out.println("open\n" + open.values());
+                System.out.println("WITH OPEN\n" + open.values());
             }
 
             open.put(n, n);

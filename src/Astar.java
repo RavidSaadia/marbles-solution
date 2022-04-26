@@ -11,50 +11,55 @@ public class Astar extends FindSolutionAlgo {
 
     }
 
+
+
+
+
+
     /***
-     * The A* algorithm.
-     * @return state gaol
+     * A* algorithm - with open list and close list.
+     *
+     * @return the gaol state
      */
     @Override
     public State findPath() {
-        makeGoalMap();
-        Hashtable<State, State> open = new Hashtable<>();
-        Hashtable<State, State> close = new Hashtable<>();
+        Hashtable<Integer, State> closeList = new Hashtable<>();
+        Hashtable<Integer, State> openList = new Hashtable<>();
         State start = new State(this.getStartState());
 
-
-        PriorityQueue<State> pq = new PriorityQueue();
-
-        pq.add(start);
-        open.put(start, start);
-        while (!pq.isEmpty()) {
-            if (isWithOpen()) {
-                System.out.println("open\n" + pq);
+        PriorityQueue<State> queue = new PriorityQueue();
+        queue.add(start);
+        openList.put(start.getId(), start);
+        while (!queue.isEmpty()) {
+            if (isWithOpen()){
+                System.out.println("OPEN:\n" + queue);
             }
-
-            State n = pq.poll();
-            open.remove(n, n);
-            if (Arrays.deepEquals(getGoal(), n.getBoard())) {
-                return n;
+            State currState = queue.poll();
+            assert currState != null;
+            openList.remove(currState.getId(), currState);
+            if (Arrays.deepEquals(getGoal(), currState.getBoard())) {
+                return currState;
             }
-            close.put(n, n);
-            Queue<State> operation = n.getLegalOperators();
+            closeList.put(currState.getId(), currState);
+            Queue<State> operation = currState.getLegalOperators();
             while (!operation.isEmpty()) {
                 State son = operation.poll();
                 heuristic(son);
 
 
-                if (open.get(son) != null && close.get(son) != null) {
-                    if (open.get(son).getHeuristic() > son.getHeuristic()) {
-                        open.replace(son, son);
+                if (openList.get(son.getId()) != null && closeList.get(son.getId()) != null) {
+                    if (openList.get(son.getId()).getHeuristic() > son.getHeuristic()) {
+                        openList.replace(son.getId(), son);
                     }
                 } else {
-                    open.put(son, son);
-                    pq.add(son);
+                    openList.put(son.getId(), son);
+                    queue.add(son);
                 }
-
             }
         }
         return null;
     }
 }
+
+
+

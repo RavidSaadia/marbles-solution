@@ -13,7 +13,6 @@ public class DFBnB extends FindSolutionAlgo {
      */
     @Override
     public State findPath() {
-        makeGoalMap();
         Hashtable<State, State> open = new Hashtable<>();
         LinkedList<State> stack = new LinkedList<>();
         State start = new State(getStartState());
@@ -23,7 +22,7 @@ public class DFBnB extends FindSolutionAlgo {
         State result = null;
         while (!stack.isEmpty()) {
             if (isWithOpen()) {
-                System.out.println("open\n" + stack);
+                System.out.println("WITH OPEN\n" + stack);
             }
             State n = stack.pop();
             if (n.isOut()) {
