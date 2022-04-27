@@ -32,8 +32,9 @@ public class Astar extends FindSolutionAlgo {
         openList.put(start.getId(), start);
         while (!queue.isEmpty()) {
             if (isWithOpen()){
-                System.out.println("OPEN:\n" + queue);
+                System.out.println("OPEN LIST:\n" + queue);
             }
+           // check every iteration the current state
             State currState = queue.poll();
             assert currState != null;
             openList.remove(currState.getId(), currState);
@@ -41,9 +42,9 @@ public class Astar extends FindSolutionAlgo {
                 return currState;
             }
             closeList.put(currState.getId(), currState);
-            Queue<State> operation = currState.getLegalOperators();
-            while (!operation.isEmpty()) {
-                State son = operation.poll();
+            Queue<State> operators = currState.getLegalOperators();
+            while (!operators.isEmpty()) {
+                State son = operators.poll();
                 heuristic(son);
 
 

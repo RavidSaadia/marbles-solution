@@ -4,75 +4,87 @@ public class DFBnB extends FindSolutionAlgo {
 
 
     public DFBnB(char[][] start, char[][] goal, boolean open) {
-        super(start,goal,open);
+        super(start, goal, open);
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /***
-     * The DFBnB algorithm.
-     * @return state gaol.
+     * DFBnB algorithm - without close list,
+     * but with stack and loop-avoidance
+     *
+     * @return the gaol state
      */
-    @Override
+     @Override
     public State findPath() {
-        Hashtable<State, State> open = new Hashtable<>();
         LinkedList<State> stack = new LinkedList<>();
+        Hashtable<State, State> openList = new Hashtable<>();
         State start = new State(getStartState());
         stack.push(start);
-        open.put(start, start);
+        openList.put(start, start);
         double t = Double.MAX_VALUE;
-        State result = null;
+        State res = null;
         while (!stack.isEmpty()) {
             if (isWithOpen()) {
-                System.out.println("WITH OPEN\n" + stack);
+                System.out.println("OPEN LIST:\n" + stack);
             }
-            State n = stack.pop();
-            if (n.isOut()) {
-                open.remove(n, n);
+            // check every iteration the current state
+            State currState = stack.pop();
+            if (currState.isOut()) {
+                openList.remove(currState, currState);
             } else {
-                n.setOut(true);
-                stack.push(n);
-
-                Queue<State> opertion = n.getLegalOperators();
-                LinkedList<State> remains = new LinkedList<>();
-                PriorityQueue<State> N = new PriorityQueue();
-                while (!opertion.isEmpty()) {
-                    State son = opertion.poll();
+                currState.setOut(true);
+                stack.push(currState);
+                Queue<State> operators = currState.getLegalOperators();
+                LinkedList<State> Stayed = new LinkedList<>();
+                PriorityQueue<State> pq = new PriorityQueue();
+                while (!operators.isEmpty()) {
+                    State son = operators.poll();
                     heuristic(son);
-
-                    N.add(son);
+                    pq.add(son);
                 }
-
-                while (!N.isEmpty()) {
-                    State son = N.poll();
-
+                // as long the PriorityQueue is not empty we continue
+                while (!pq.isEmpty()) {
+                    State son = pq.poll();
                     if (son.getHeuristic() >= t) {
-                        N.clear();
-                    } else if (open.get(son) != null && open.get(son).isOut()) {
+                        pq.clear();
+                    } else if (openList.get(son) != null && openList.get(son).isOut()) {
                         continue;
-                    } else if (open.get(son) != null && !open.get(son).isOut()) {
-                        if (open.get(son).getHeuristic() <= son.getHeuristic()) {
+                    } else if (openList.get(son) != null && !openList.get(son).isOut()) {
+                        if (openList.get(son).getHeuristic() <= son.getHeuristic()) {
                             continue;
                         } else {
-                            stack.remove(open.get(son));
-                            open.remove(open.get(son), open.get(son));
-                            remains.addFirst(son);
+                            stack.remove(openList.get(son));
+                            openList.remove(openList.get(son), openList.get(son));
+                            Stayed.addFirst(son);
                         }
                     } else if (Arrays.deepEquals(son.getBoard(), getGoal())) {
                         t = son.getHeuristic();
-                        result = son;
-                        N.clear();
-                    } else if (open.get(son) == null) {
-                        remains.addFirst(son);
+                        res = son;
+                        pq.clear();
+                    } else if (openList.get(son) == null) {
+                        Stayed.addFirst(son);
                     }
                 }
-
-                while (!remains.isEmpty()) {
-                    State son = remains.poll();
+                while (!Stayed.isEmpty()) {
+                    State son = Stayed.poll();
                     stack.push(son);
-                    open.put(son, son);
+                    openList.put(son, son);
                 }
             }
         }
-
-        return result;
+        return res;
     }
 }

@@ -1,4 +1,4 @@
-BFS
+IDA*
 no open
 big
 R,R,_,R,Y

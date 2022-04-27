@@ -35,15 +35,16 @@ public class BFS extends FindSolutionAlgo {
         }
         while (!queue.isEmpty()) {
             if (isWithOpen()) {
-                System.out.println("OPEN:\n" + queue);
+                System.out.println("OPEN LIST:\n" + queue);
             }
+            // check every iteration the current state
             State currState = queue.poll();
             assert currState != null;
             openList.remove(currState,currState);
             closeList.put(currState, currState);
-            Queue<State> operation = currState.getLegalOperators();
-            while (!operation.isEmpty()) {
-                State son = operation.poll();
+            Queue<State> operators = currState.getLegalOperators();
+            while (!operators.isEmpty()) {
+                State son = operators.poll();
                 if (closeList.get(son) != null || openList.get(son) != null) { // in closeList list
                     continue;
                 }

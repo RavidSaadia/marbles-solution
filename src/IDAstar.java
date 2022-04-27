@@ -8,47 +8,66 @@ public class IDAstar extends FindSolutionAlgo{
 
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /***
+     * IDA* algorithm - without close list,
+     * but with stack and loop-avoidance
+     *
+     * @return the gaol state
+     */
     @Override
     public State findPath() {
 
-        Hashtable<State, State> open = new Hashtable<>();
         Stack<State> stack = new Stack<>();
+        Hashtable<State, State> openList = new Hashtable<>();
         State start = new State(getStartState());
         heuristic(start);
         double t = start.getHeuristic();
         while (t != Double.MAX_VALUE) {
-            double minf = Double.MAX_VALUE;
+            double minF = Double.MAX_VALUE;
             start.setOut(false);
             stack.push(start);
-            open.put(start, start);
+            openList.put(start, start);
 
             while (!stack.isEmpty()) {
                 if (isWithOpen()) {
-                    System.out.println("WITH OPEN\n" + stack);
+                    System.out.println("OPEN LIST:\n" + stack);
                 }
-                State n = stack.pop();
-                if (n.isOut()) {
-                    open.remove(n, n);
+                State currState = stack.pop();
+                if (currState.isOut()) {
+                    openList.remove(currState, currState);
                 } else {
-                    n.setOut(true);
-                    stack.push(n);
+                    currState.setOut(true);
+                    stack.push(currState);
                     if (isWithOpen()) {
-                        System.out.println("open\n" + stack);
+                        System.out.println("OPEN LIST:\n" + stack);
                     }
 
-                    Queue<State> opertion = n.getLegalOperators();
-                    while (!opertion.isEmpty()) {
-                        State son = opertion.poll();
+                    Queue<State> operators = currState.getLegalOperators();
+                    while (!operators.isEmpty()) {
+                        State son = operators.poll();
                         heuristic(son);
                         if (son.getHeuristic() > t) {
-                            minf = Math.min(son.getHeuristic(), minf);
+                            minF = Math.min(son.getHeuristic(), minF);
                             continue;
-                        } else if (open.get(son) != null && open.get(son).isOut()) {
+                        } else if (openList.get(son) != null && openList.get(son).isOut()) {
                             continue;
-                        } else if (open.get(son) != null && !open.get(son).isOut()) {
-                            if (open.get(son).getHeuristic() > son.getHeuristic()) {
-                                stack.remove(open.get(son));
-                                open.remove(open.get(son), open.get(son));
+                        } else if (openList.get(son) != null && !openList.get(son).isOut()) {
+                            if (openList.get(son).getHeuristic() > son.getHeuristic()) {
+                                stack.remove(openList.get(son));
+                                openList.remove(openList.get(son), openList.get(son));
                             } else {
                                 continue;
                             }
@@ -57,11 +76,11 @@ public class IDAstar extends FindSolutionAlgo{
                             return son;
                         }
                         stack.push(son);
-                        open.put(son, son);
+                        openList.put(son, son);
                     }
                 }
             }
-            t = minf;
+            t = minF;
 
         }
         return null;

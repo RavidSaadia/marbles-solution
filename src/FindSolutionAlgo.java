@@ -22,6 +22,13 @@ public abstract class FindSolutionAlgo {
         PRICE.put('B', 2);
     }
 
+    /**
+     * This class is for save the indexes of all the marbles
+     * by there color.
+     * That for we can compare all the possibilities to match
+     * each pair of marbles from the current state and the goal
+     * (in big board there are 24 possibilities for each color = 4!)
+     */
     private class ColorIndexes {
         //contains the colors that we saw already
 //      HashSet<Character> colors = new HashSet<>();
@@ -45,10 +52,11 @@ public abstract class FindSolutionAlgo {
      * @param state
      */
     protected void heuristic(State state) {
-        //contains for etch color, the indexes in the <current state & goal state>
+        //contains the colors that we already handle.
         HashSet<Character> colors = new HashSet<>();
-        double sum = Double.MAX_VALUE, avg;
+        //contains for etch color, the indexes in the <current state & goal state>
         Hashtable<ColorIndexes, ColorIndexes> compareMap = new Hashtable<>();
+        //set the compareMap
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 char color = state.getBoard()[i][j];
@@ -60,89 +68,15 @@ public abstract class FindSolutionAlgo {
                 }
             }
         }
-
         state.setHeuristic(calcHeuristic(compareMap));// set the lower heuristic
-
-//        for (int i = 0; i < 4; i++) {
-//
-//
-//        }
-
-
-//        boolean[][] stateChecked = new boolean[size][size];
-//        boolean[][] goalIsCatched = new boolean[size][size]; // mark the places that was taken already
-//        int[][] minPath = new int[size][size];
-//        for (int i = 0; i < size; i++) {
-//            for (int j = 0; j < size; j++) {
-//                minPath[i][j] = Integer.MAX_VALUE; // impossible distance just for initialize
-//            }
-//        }
-//        int mindist = 0;
-//        char[][] curr = state.getBoard();
-////        double sum = 0, avg;
-//
-//        for (int i = 0; i < size; i++) {
-//            for (int j = 0; j < size; j++) {
-//                // for every cell in the state
-//                if (curr[i][j] == '_') {
-//                    continue;
-//                }
-//
-//                int kTemp = 0, lTemp = 0; // K/L = row/colum index of the goal state
-//                kLoop:
-//                for (int k = 0; k < size; k++) {
-//                    for (int l = 0; l < size; l++) {
-//                        // for every cell in goal
-//                        if (curr[i][j] == goal[k][l] && !goalIsCatched[k][l]) {
-//                            int dist = calcDistance(i, j, k, l, curr[i][j]);
-//                            if (minPath[i][j] > dist) {
-//                                minPath[i][j] = dist;
-//                                kTemp = k;
-//                                lTemp = l;
-//                                if (dist == 0) {
-//                                    break kLoop;
-//                                } // 0 is the smallest value...
-//                            }
-//
-//                        }
-//
-//                    }
-//                }
-//                goalIsCatched[kTemp][lTemp] = true;
-//
-//            }
-//        }
-//        // sum the minimum paths of all the marbles
-//        for (int i = 0; i < size; i++) {
-//            for (int j = 0; j < size; j++) {
-//                if (minPath[i][j] != Integer.MAX_VALUE) {
-//                    sum += minPath[i][j];
-//                }
-//            }
-//        }
-//        state.setHeuristic(sum);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//    public static void permute(LinkedList<int[]> intArray, int start, Integer sum) {
-//
-//        for (int i = start; i < intArray.size(); i++) {
-//            int[] temp = intArray.get(start);
-//            intArray.set(start, intArray.get(i));
-//            intArray.set(i, temp);
-//            permute(intArray, start + 1, sum);
-//            intArray.set(i, intArray.get(start));
-//            intArray.set(start, temp);
-//        }
-//        if (start == intArray.size() - 1) {
-//            int tempSum = ;
-//            if (sum < tempSum) {
-//                sum = tempSum;
-//            }
-//        }
-//    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * calculate the min heuristic by compare all matches.
+     *
+     * @param compareMap
+     * @return
+     */
     private int calcHeuristic(Hashtable<ColorIndexes, ColorIndexes> compareMap) {
         final int[] heuristic = {0};
         Hashtable<Character, Integer> sumMap = new Hashtable<>();
@@ -162,38 +96,47 @@ public abstract class FindSolutionAlgo {
         return heuristic[0];
     }
 
+    /**
+     * compare between 24 options: (x,y,z,w) = 4! = 24
+     *
+     * @param curStateIndx
+     * @param goalStateIndx
+     * @param color
+     * @return
+     */
     private Integer setSum24(ColorIndexes curStateIndx, ColorIndexes goalStateIndx, char color) {
         Integer sum = Integer.MAX_VALUE;
         Integer tempSum;
-
         for (int i = 0; i < 4; i++) {
-//            tempSum = calcColorSum(curStateIndx.indxList, goalStateIndx.indxList, color);
-//            if (sum > tempSum) {
-//                sum = tempSum;
-//            }
             for (int j = 0; j < 3; j++) {
-//                tempSum = calcColorSum(curStateIndx.indxList, goalStateIndx.indxList, color);
-//                if (sum > tempSum) {
-//                    sum = tempSum;
-//                }
                 for (int k = 0; k < 2; k++) {
                     tempSum = calcColorSum(curStateIndx.indxList, goalStateIndx.indxList, color);
                     if (sum > tempSum) {
                         sum = tempSum;
                     }
+                    // swap between the third and forth places.
                     int[] temp = curStateIndx.indxList.remove(2);
                     curStateIndx.indxList.add(temp);
                 }
+                // swap between the second and third places.
                 int[] temp = curStateIndx.indxList.remove(1);
                 curStateIndx.indxList.add(temp);
             }
+            // swap between the first and second places.
             int[] temp = curStateIndx.indxList.removeFirst();
             curStateIndx.indxList.add(temp);
         }
-
         return sum;
     }
 
+    /**
+     * compare between 2 options: (x,y) and (y,x) = 2!
+     *
+     * @param curStateIndx
+     * @param goalStateIndx
+     * @param color
+     * @return
+     */
     private Integer setSum2(ColorIndexes curStateIndx, ColorIndexes goalStateIndx, char color) {
         Integer sum1;
         Integer sum2;
@@ -205,6 +148,16 @@ public abstract class FindSolutionAlgo {
         return Math.min(sum1, sum2);
     }
 
+    /**
+     * calculate the price by the color and the distance.
+     * calculate as the path is all clear, and we move the marbles
+     * straight to the target.
+     *
+     * @param currStates
+     * @param goalStates
+     * @param color
+     * @return
+     */
     private Integer calcColorSum(LinkedList<int[]> currStates, LinkedList<int[]> goalStates, char color) {
         int sum = 0;
         for (int i = 0; i < currStates.size(); i++) {
@@ -212,21 +165,6 @@ public abstract class FindSolutionAlgo {
         }
         return sum;
     }
-
-//    private void findBestMatch(LinkedList<int[]> indxList, LinkedList<int[]> indxList1, int sum, int k) {
-//        for(int i = k; i < indxList.size(); i++){
-//            java.util.Collections.swap(indxList, i, k);
-//            findBestMatch(indxList,indxList1,sum, k+1);
-//            java.util.Collections.swap(indxList, k, i);
-//        }
-//        if (k == indxList.size() -1){
-//            if (calcDistance(indxList.)){
-//
-//            };
-//        }
-//
-//    }
-
 
     private ColorIndexes setColorInMap(char color, char[][] board) {
         ColorIndexes res = new ColorIndexes(color);
