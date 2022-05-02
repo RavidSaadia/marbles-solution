@@ -26,7 +26,7 @@ public abstract class FindSolutionAlgo {
      * This class is for save the indexes of all the marbles
      * by there color.
      * That for we can compare all the possibilities to match
-     * each pair of marbles from the current state and the goal
+     * each pair of marbles from the current state and the goal state
      * (in big board there are 24 possibilities for each color = 4!)
      */
     private class ColorIndexes {
@@ -97,11 +97,13 @@ public abstract class FindSolutionAlgo {
     }
 
     /**
-     * compare between 24 options: (x,y,z,w) = 4! = 24
-     *
+     * compare between 24 options: (x,y,z,w)...(w,z,y,x) = 4! = 24
+     * by changing the curStateIndx order 24 times and check every time
+     * if the indexes compare get better result then the others.
+     * we assume that every color appears at least 4 times.
      * @param curStateIndx
      * @param goalStateIndx
-     * @param color
+     * @param color the color
      * @return
      */
     private Integer setSum24(ColorIndexes curStateIndx, ColorIndexes goalStateIndx, char color) {

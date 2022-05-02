@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -21,10 +22,14 @@ public class SolutionManager {
 
     public SolutionManager(String inputFile) {
         this.findSolAlgo = readInput(inputFile);
-        double start=(double)(System.currentTimeMillis())/1000;
-        this.ans = findSolAlgo.findPath();
-        double end=(double)(System.currentTimeMillis())/1000;
-        this.time=end-start;
+        double start = (double) (System.currentTimeMillis()) / 1000;
+        if (findSolAlgo == null) {
+            this.ans = null;
+        } else {
+            this.ans = findSolAlgo.findPath();
+        }
+        double end = (double) (System.currentTimeMillis()) / 1000;
+        this.time = end - start;
         writeRes("output.txt");
     }
 
@@ -37,7 +42,6 @@ public class SolutionManager {
             File myObj = new File(inputFile);
             Scanner myReader = new Scanner(myObj);
 
-            int n, m;
             String line = "";
             line = myReader.nextLine(); // line 1
             algoType = line;
@@ -61,6 +65,9 @@ public class SolutionManager {
             }
             myReader.close();
 
+            if (!isTherePath(start, goal)) {
+                return null;
+            }
             switch (algoType) {
                 case "BFS":
                     return new BFS(start, goal, printOpenList);
@@ -80,12 +87,55 @@ public class SolutionManager {
         } catch (FileNotFoundException ex) {
             System.err.println("Error, file not found : " + ex);
             exit(1);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println("Error while reading the file : " + ex);
             exit(1);
         }
         return null;
+    }
+
+    /**
+     * Check if the marbles in the start state and the goal state are same.
+     * if not, there is no path otherwise there is.
+     *
+     * @param start
+     * @param goal
+     * @return
+     */
+    private boolean isTherePath(char[][] start, char[][] goal) {
+
+        // contain the color/empty and the number of seen in board
+        Hashtable<Character, Integer> goalMarbles = new Hashtable<>();
+        Hashtable<Character, Integer> startMarbles = new Hashtable<>();
+        int size = start.length;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+               char gColor = goal[i][j];
+               char sColor = start[i][j];
+               if (goalMarbles.containsKey(gColor)){
+                   Integer newGnum = goalMarbles.get(gColor);
+                   goalMarbles.put(gColor,newGnum+ 1);
+               }
+               else {
+                   goalMarbles.put(gColor, 1);
+               }
+
+                if (startMarbles.containsKey(sColor)){
+                    Integer newSnum = startMarbles.get(sColor);
+                    startMarbles.put(sColor,newSnum+ 1);
+                }
+                else {
+                    startMarbles.put(sColor, 1);
+                }
+            }
+        }
+
+        for (Character color: startMarbles.keySet()) {
+            if (!goalMarbles.containsKey(color) || goalMarbles.get(color)!=startMarbles.get(color)){
+                return false;
+            }
+        }
+        return true;
     }
 
     /***
@@ -93,15 +143,15 @@ public class SolutionManager {
      * @param file-file name
      * @return
      */
-    private   void writeRes(String file){
+    private void writeRes(String file) {
         try {
 
             FileWriter myWriter = new FileWriter(file);
 
-            if(ans==null){
+            if (ans == null) {
                 myWriter.append("no path\n");
                 myWriter.append("Num: ").append(String.valueOf(State.NODE_NUMBER)).append("\n");
-                if(true){
+                if (true) {
                     myWriter.append("").append(String.valueOf(time)).append(" seconds\n");
                 }
                 myWriter.close();
@@ -111,7 +161,7 @@ public class SolutionManager {
             myWriter.append("\n");
             myWriter.append("Num: ").append(String.valueOf(ans.getId())).append("\n");
             myWriter.append("Cost: ").append(String.valueOf(ans.getPrice())).append("\n");
-            if(true){
+            if (true) {
                 myWriter.append("").append(String.valueOf(time)).append(" seconds\n");
             }
             myWriter.close();

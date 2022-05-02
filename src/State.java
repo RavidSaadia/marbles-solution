@@ -71,7 +71,7 @@ public class State implements Comparable<State> {
     private State father = null;
     private int id;
     private int price = 0;
-    private double heuristic = 0;
+    private int heuristic = 0;
     private String step = "";
     private String path = "";
     private int level = 0;
@@ -86,7 +86,7 @@ public class State implements Comparable<State> {
 
     public State(int len){boardSize=len;}
 
-    public State(char[][] board, State father, int level, int price, double heuristic, String path, String step) {
+    public State(char[][] board, State father, int level, int price, int heuristic, String path, String step) {
         boardSize = board.length;
         this.board = board;
         this.father = father;
@@ -105,8 +105,8 @@ public class State implements Comparable<State> {
 
 
     public State(char[][] board) {
-        this.board = board;
         boardSize = board.length;
+        this.board = board;
         emptyPosList = new LinkedList<>();
 //        emptyMatrix = new boolean[boardSize][boardSize];
 //        positions = new Position[(boardSize-3)*3+3]; // num of empty places: if(boardSize=3)->3 if(boardSize=5)->9
@@ -202,12 +202,9 @@ public class State implements Comparable<State> {
         if (this.father == null) {
             return false;
         }
-        char[][] father = deepBoardCopy(this.board);
-        makeMove(father, pos);
-        if (isBoardEquals(this.father.board, father)) {
-            return true;
-        }
-        return false;
+        char[][] fatherBoard = deepBoardCopy(this.board);
+        makeMove(fatherBoard, pos);
+        return isBoardEquals(this.father.board, fatherBoard);
     }
 
     /**
@@ -318,24 +315,26 @@ public class State implements Comparable<State> {
      * @return true if the action is not legal.
      */
     private boolean emptyOrEdge(EmptyPos pos) {
+        int i =pos.getI();
+        int j =pos.getJ();
         switch (pos.getDirection()) {
             case 'U':
-                if (pos.getI() == 0 || (board[pos.getI() - 1][pos.getJ()] == EMPTY)) {
+                if (i == 0 || (board[i - 1][j] == EMPTY)) {
                     return true;
                 }
                 break;
             case 'D':
-                if (pos.getI() == boardSize - 1 || (board[pos.getI() + 1][pos.getJ()] == EMPTY)) {
+                if (i == boardSize - 1 || (board[i + 1][j] == EMPTY)) {
                     return true;
                 }
                 break;
             case 'L':
-                if (pos.getJ() == 0 || (board[pos.getI()][pos.getJ() - 1] == EMPTY)) {
+                if (j == 0 || (board[i][j - 1] == EMPTY)) {
                     return true;
                 }
                 break;
             case 'R':
-                if (pos.getJ() == boardSize - 1 || (board[pos.getI()][pos.getJ() + 1] == EMPTY)) {
+                if (j == boardSize - 1 || (board[i][j + 1] == EMPTY)) {
                     return true;
                 }
                 break;
@@ -398,7 +397,7 @@ public class State implements Comparable<State> {
         return id;
     }
 
-    public double getHeuristic() {
+    public int getHeuristic() {
         return heuristic;
     }
 
@@ -443,7 +442,7 @@ public class State implements Comparable<State> {
      * set the heuristic value of this state(only for informed algorithms).
      * @param heuristic heuristic value
      */
-    public void setHeuristic(double heuristic) {
+    public void setHeuristic(int heuristic) {
         this.heuristic = heuristic;
     }
 

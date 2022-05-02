@@ -1,24 +1,12 @@
 import java.util.*;
 
-public class IDAstar extends FindSolutionAlgo{
+public class IDAstar extends FindSolutionAlgo {
 
 
     public IDAstar(char[][] start, char[][] goal, boolean open) {
-        super(start,goal,open);
+        super(start, goal, open);
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /***
@@ -59,12 +47,13 @@ public class IDAstar extends FindSolutionAlgo{
                     while (!operators.isEmpty()) {
                         State son = operators.poll();
                         heuristic(son);
-                        if (son.getHeuristic() > t) {
-                            minF = Math.min(son.getHeuristic(), minF);
+                        int f = son.getHeuristic() + son.getPrice();
+                        if (f > t) {
+                            minF = Math.min(f, minF);
                             continue;
-                        } else if (openList.get(son) != null && openList.get(son).isOut()) {
+                        } else if (openList.get(son) != null && son.isOut()) { // if we recognise loop
                             continue;
-                        } else if (openList.get(son) != null && !openList.get(son).isOut()) {
+                        } else if (openList.get(son) != null && !son.isOut()) { // if we recognise state that we saw already
                             if (openList.get(son).getHeuristic() > son.getHeuristic()) {
                                 stack.remove(openList.get(son));
                                 openList.remove(openList.get(son), openList.get(son));
@@ -84,5 +73,13 @@ public class IDAstar extends FindSolutionAlgo{
 
         }
         return null;
+    }
+
+    private boolean hasOutState(Hashtable<State, State> openList) {
+        final boolean[] res = {false};
+        openList.forEach((s1,s2)->{
+           res[0] |= s1.isOut();
+        });
+    return res[0];
     }
 }

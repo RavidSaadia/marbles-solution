@@ -25,7 +25,7 @@ public class Astar extends FindSolutionAlgo {
     public State findPath() {
         Hashtable<Integer, State> closeList = new Hashtable<>();
         Hashtable<Integer, State> openList = new Hashtable<>();
-        State start = new State(this.getStartState());
+        State start = new State(getStartState());
 
         PriorityQueue<State> queue = new PriorityQueue();
         queue.add(start);
@@ -49,6 +49,7 @@ public class Astar extends FindSolutionAlgo {
 
 
                 if (openList.get(son.getId()) != null && closeList.get(son.getId()) != null) {
+                   double f = openList.get(son.getId()).getHeuristic() +openList.get(son.getId()).getPrice();
                     if (openList.get(son.getId()).getHeuristic() > son.getHeuristic()) {
                         openList.replace(son.getId(), son);
                     }
