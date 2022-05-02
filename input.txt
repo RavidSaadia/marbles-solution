@@ -1,17 +1,26 @@
-BFS
+IDA*
 no open
 big
-G,B,G,G,_
-G,G,G,G,G
-G,G,G,G,G
-B,G,B,G,G
-G,B,G,G,G
+R,_,R,R,Y
+B,_,B,_,Y
+G,_,G,G,B
+_,Y,B,R,_
+G,_,Y,_,_
 Goal state
-G,G,G,G,G
-G,G,G,G,G
-B,G,B,G,G
-G,B,B,G,G
-_,G,G,G,G
+R,R,_,_,Y
+B,B,_,_,Y
+G,G,G,_,_
+_,B,Y,R,_
+G,Y,B,_,R
+
+
+
+R,R,_,_,Y
+B,B,_,_,Y
+G,G,_,G,_
+_,B,Y,R,_
+G,Y,B,_,R
+
 
 
 

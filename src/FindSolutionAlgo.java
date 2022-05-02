@@ -10,7 +10,7 @@ public abstract class FindSolutionAlgo {
     private char[][] goal;
     private boolean withOpen;
     private int size;
-
+public static int numoftemp0=0;
     public FindSolutionAlgo(char[][] startState, char[][] goal, boolean withOpen) {
         size = goal.length;
         this.startState = startState;
@@ -109,12 +109,17 @@ public abstract class FindSolutionAlgo {
     private Integer setSum24(ColorIndexes curStateIndx, ColorIndexes goalStateIndx, char color) {
         Integer sum = Integer.MAX_VALUE;
         Integer tempSum;
+        outLoop:
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 2; k++) {
                     tempSum = calcColorSum(curStateIndx.indxList, goalStateIndx.indxList, color);
                     if (sum > tempSum) {
                         sum = tempSum;
+                    }
+                    if (tempSum==0){
+//                        System.out.println(numoftemp0++);
+                        break outLoop;
                     }
                     // swap between the third and forth places.
                     int[] temp = curStateIndx.indxList.remove(2);

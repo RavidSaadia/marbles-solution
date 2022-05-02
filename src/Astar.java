@@ -23,13 +23,13 @@ public class Astar extends FindSolutionAlgo {
      */
     @Override
     public State findPath() {
-        Hashtable<Integer, State> closeList = new Hashtable<>();
-        Hashtable<Integer, State> openList = new Hashtable<>();
+        Hashtable<State, State> closeList = new Hashtable<>();
+        Hashtable<State, State> openList = new Hashtable<>();
         State start = new State(getStartState());
 
         PriorityQueue<State> queue = new PriorityQueue();
         queue.add(start);
-        openList.put(start.getId(), start);
+        openList.put(start, start);
         while (!queue.isEmpty()) {
             if (isWithOpen()){
                 System.out.println("OPEN LIST:\n" + queue);
@@ -37,24 +37,24 @@ public class Astar extends FindSolutionAlgo {
            // check every iteration the current state
             State currState = queue.poll();
             assert currState != null;
-            openList.remove(currState.getId(), currState);
+            openList.remove(currState, currState);
             if (Arrays.deepEquals(getGoal(), currState.getBoard())) {
                 return currState;
             }
-            closeList.put(currState.getId(), currState);
+            closeList.put(currState, currState);
             Queue<State> operators = currState.getLegalOperators();
             while (!operators.isEmpty()) {
                 State son = operators.poll();
                 heuristic(son);
 
 
-                if (openList.get(son.getId()) != null && closeList.get(son.getId()) != null) {
-                   double f = openList.get(son.getId()).getHeuristic() +openList.get(son.getId()).getPrice();
-                    if (openList.get(son.getId()).getHeuristic() > son.getHeuristic()) {
-                        openList.replace(son.getId(), son);
+                if (openList.get(son) != null && closeList.get(son) != null) {
+                   int f = openList.get(son ).getHeuristic() +openList.get(son ).getPrice();
+                    if (openList.get(son ).getHeuristic() > son.getHeuristic()) {
+                        openList.replace(son , son);
                     }
                 } else {
-                    openList.put(son.getId(), son);
+                    openList.put(son , son);
                     queue.add(son);
                 }
             }
