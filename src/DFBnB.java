@@ -58,11 +58,15 @@ public class DFBnB extends FindSolutionAlgo {
                 // as long the PriorityQueue is not empty we continue
                 while (!pq.isEmpty()) {
                     State son = pq.poll();
-                    if (son.getHeuristic() + son.getPrice() >= t) {
-                        pq.clear();
-                    } else if (openList.get(son) != null && openList.get(son).isOut()) {
+                    int f = son.getHeuristic() + son.getPrice();
+                    if ( f >= t) {
+                        double finalT = t;
+                        pq.removeIf(state -> (state.getPrice()+state.getHeuristic()) >= finalT);
+//                        pq.clear();
+                    } else if (openList.get(son) != null && son.isOut()) {
+                        pq.remove(son);
                         continue;
-                    } else if (openList.get(son) != null && !openList.get(son).isOut()) {
+                    } else if (openList.get(son) != null && son.isOut()) {
                         if (son.getHeuristic() <= son.getHeuristic()) {
                             continue;
                         } else {
@@ -71,7 +75,7 @@ public class DFBnB extends FindSolutionAlgo {
                             Stayed.addFirst(son);
                         }
                     } else if (Arrays.deepEquals(son.getBoard(), getGoal())) {
-                        t = son.getHeuristic();
+                        t = son.getPrice();
                         res = son;
                         pq.clear();
                     } else if (openList.get(son) == null) {
