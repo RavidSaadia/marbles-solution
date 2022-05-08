@@ -60,14 +60,15 @@ public class DFBnB extends FindSolutionAlgo {
                     State son = pq.poll();
                     int f = son.getHeuristic() + son.getPrice();
                     if ( f >= t) {
-                        double finalT = t;
-                        pq.removeIf(state -> (state.getPrice()+state.getHeuristic()) >= finalT);
+//                        double finalT = t;
+//                        pq.removeIf(state -> (state.getPrice()+state.getHeuristic()) >= finalT);
                         pq.clear();
                     } else if (openList.get(son) != null && son.isOut()) {
                         pq.remove(son);
                         continue;
                     } else if (openList.get(son) != null && son.isOut()) {
-                        if (son.getHeuristic() <= son.getHeuristic()) {
+                        if (openList.get(son).getHeuristic() + openList.get(son).getPrice() <= son.getHeuristic()+son.getPrice()) {
+                            //להוסיף F ןG
                             continue;
                         } else {
                             stack.remove(openList.get(son));
@@ -84,7 +85,7 @@ public class DFBnB extends FindSolutionAlgo {
                 }
                 while (!Stayed.isEmpty()) {
                     State son = Stayed.poll();
-                    stack.push(son);
+                    stack.addAll(Stayed);
                     openList.put(son, son);
                 }
             }
