@@ -27,7 +27,7 @@ public class DFBnB extends FindSolutionAlgo {
      *
      * @return the gaol state
      */
-     @Override
+    @Override
     public State findPath() {
         LinkedList<State> stack = new LinkedList<>();
         Hashtable<State, State> openList = new Hashtable<>();
@@ -62,7 +62,7 @@ public class DFBnB extends FindSolutionAlgo {
                     if ( f >= t) {
                         double finalT = t;
                         pq.removeIf(state -> (state.getPrice()+state.getHeuristic()) >= finalT);
-//                        pq.clear();
+                        pq.clear();
                     } else if (openList.get(son) != null && son.isOut()) {
                         pq.remove(son);
                         continue;
