@@ -1,28 +1,124 @@
-IDA*
+A*
 no open
-big
-R,_,R,R,Y
-B,_,B,_,Y
-G,_,G,G,B
-_,Y,B,R,_
-G,_,Y,_,_
-Goal state
-R,R,_,_,Y
-B,B,_,_,Y
-G,G,G,_,_
-_,B,Y,R,_
-G,Y,B,_,R
+small
+_,R,G
+B,G,R
+G,B,_
+Goal state:
+G,_,R
+B,G,R
+_,B,G
 
 
 
-R,R,_,_,Y
-B,B,_,_,Y
-G,G,_,G,_
-_,B,Y,R,_
-G,Y,B,_,R
+A*
+no open
+small
+_,R,G
+B,G,R
+G,B,_
+Goal state:
+G,R,_
+B,G,R
+_,B,G
 
 
 
+O:
+ -BOARD-
+[R, _, G]
+[B, G, R]
+[G, B, _]
 
 
+import java.util.*;
 
+public class DFBnB extends FindSolutionAlgo {
+
+
+    public DFBnB(char[][] start, char[][] goal, boolean open) {
+        super(start, goal, open);
+    }
+
+
+    /***
+     * DFBnB algorithm - without close list,
+     * but with stack and loop-avoidance
+     *
+     * @return the gaol state
+     */
+    @Override
+    public State findPath() {
+        LinkedList<State> stack = new LinkedList<>();
+        Hashtable<State, State> openList = new Hashtable<>();
+        State start = new State(getStartState());
+        stack.push(start);
+        openList.put(start, start);
+        double t = Double.MAX_VALUE;
+        State res = null;
+        while (!stack.isEmpty()) {
+            if (isWithOpen()) {
+                System.out.println("OPEN LIST:\n" + stack);
+            }
+            // check every iteration the current state
+            State currState = stack.pop();
+
+            if (currState.isOut()) {
+                openList.remove(currState, currState);
+            } else {
+                currState.setOut(true);
+                stack.push(currState);
+                Queue<State> NQueue = currState.getLegalOperators();
+                PriorityQueue<State> N = new PriorityQueue<>();
+
+                while (!NQueue.isEmpty()) {
+                    State son = NQueue.poll();
+                    heuristic(son);
+                    N.add(son);
+                }
+                LinkedList<State> Stayed = new LinkedList<>();
+                PriorityQueue<State> pq = new PriorityQueue();
+//                for (State s:N) {
+//                    heuristic(s);
+//                }
+//
+                // as long the PriorityQueue is not empty we continue
+//                while (!N.isEmpty()) {
+                for (Iterator<State> iterator = N.iterator();iterator.hasNext();) {
+                    State son = iterator.next();
+                    int f = son.getHeuristic() + son.getPrice();
+                    if (f >= t) {
+                        double finalT = t;
+                        N.removeIf(state -> (state.getPrice() + state.getHeuristic()) >= finalT);
+//                        pq.clear();
+                    } else if (openList.get(son) != null && son.isOut()) {
+                        iterator.remove();
+                        continue;
+                    } else if (openList.get(son) != null && !openList.get(son).isOut()) {
+                        if (openList.get(son).getHeuristic() <= son.getHeuristic()) {
+                            iterator.remove();
+                            continue;
+                        } else {
+                            stack.remove(openList.get(son));
+                            openList.remove(openList.get(son), openList.get(son));
+                            Stayed.addFirst(son);
+                        }
+                    } else if (Arrays.deepEquals(son.getBoard(), getGoal())) {
+                        t = son.getPrice() + son.getHeuristic();
+                        res = son;
+                        double finalT = t;
+                        N.removeIf(state -> (state.getPrice() + state.getHeuristic()) >= finalT);
+                    } else if (openList.get(son) == null) {
+                        Stayed.addFirst(son);
+                    }
+                }
+                while (!N.isEmpty()) {
+                    State son = N.poll();
+                    stack.push(son);
+                    openList.put(son, son);
+                }
+            }
+        }
+        return res;
+    }
+}

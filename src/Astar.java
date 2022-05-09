@@ -27,7 +27,7 @@ public class Astar extends FindSolutionAlgo {
         Hashtable<State, State> openList = new Hashtable<>();
         State start = new State(getStartState());
 
-        PriorityQueue<State> queue = new PriorityQueue();
+        PriorityQueue<State> queue = new PriorityQueue<>();
         queue.add(start);
         openList.put(start, start);
         while (!queue.isEmpty()) {
