@@ -75,17 +75,17 @@ public class DFBnB extends FindSolutionAlgo {
                             openList.remove(openList.get(son), openList.get(son));
                             Stayed.addFirst(son);
                         }
-                    } else if (Arrays.deepEquals(son.getBoard(), getGoal())) {
-                        t = son.getPrice();
+                    } else if (Arrays.deepEquals(son.getBoard(), getGoal())) { //if we reached here, f(son) < t
+                        t = son.getPrice() + son.getHeuristic();
                         res = son;
-                        pq.clear();
+                        pq.clear(); // no need to check the other nodes! we
                     } else if (openList.get(son) == null) {
                         Stayed.addFirst(son);
                     }
                 }
-                while (!Stayed.isEmpty()) {
+                while (!Stayed.isEmpty()) { // insert in revers order
                     State son = Stayed.poll();
-                    stack.addAll(Stayed);
+                    stack.add(son);
                     openList.put(son, son);
                 }
             }
