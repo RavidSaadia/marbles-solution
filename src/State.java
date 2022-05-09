@@ -493,10 +493,10 @@ public class State implements Comparable<State> {
 
     @Override
     public int compareTo(State o) {
-        if (o.getHeuristic() + o.getPrice() == this.getHeuristic()+o.getPrice()) {
-            return Integer.compare(this.getId(), o.getId());
+        if (o.getHeuristic() + o.getPrice() == this.getHeuristic()+this.getPrice()) {
+            return Integer.compare( o.getId(),this.getId());
         }
-        return Integer.compare(this.getHeuristic()+o.getPrice(), o.getHeuristic()+o.getPrice());
+        return Integer.compare(this.getHeuristic()+this.getPrice(), o.getHeuristic()+o.getPrice());
 
     }
 
